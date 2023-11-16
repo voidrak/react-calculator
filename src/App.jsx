@@ -10,6 +10,28 @@ export const ACTIONS = {
   CHOOSE_OPERATION: "choose",
   EVALUATE: "evaluate",
 };
+function evaluate({ currentOperand, previousOperand, operation }) {
+  const curr = parseFloat(currentOperand);
+  const prev = parseFloat(previousOperand);
+  if (isNaN(curr) || isNaN(prev)) {
+    return {};
+  }
+  let solution = " ";
+  switch (operation) {
+    case "+":
+      solution = curr + prev;
+      break;
+    case "-":
+      solution = prev - curr;
+      break;
+    case "÷":
+      solution = prev / curr;
+      break;
+    case "*":
+      solution = prev * curr;
+  }
+  return solution;
+}
 
 function reducer(state, { type, payload }) {
   switch (type) {
@@ -25,14 +47,33 @@ function reducer(state, { type, payload }) {
         currentOperand: `${state.currentOperand || ""}${payload.digit}`,
       };
     case ACTIONS.CHOOSE_OPERATION:
-      if (state.currentOperand == null) {
+      if (state.currentOperand == null && state.previousOperand == null) {
         return state;
+      }
+      if (state.currentOperand == null) {
+        return {
+          ...state,
+          operand: payload.operation,
+        };
       }
       return {
         ...state,
         currentOperand: null,
         previousOperand: state.currentOperand,
         operand: payload.operation,
+      };
+    case ACTIONS.EVALUATE:
+      if (
+        state.currentOperand == null ||
+        state.previousOperand == null ||
+        operand == null
+      ) {
+        return state;
+      }
+      return {
+        ...state,
+        currentOperand: evaluate(state),
+        previousOperand: null,
       };
   }
 }
@@ -53,8 +94,7 @@ const App = () => {
       </div>
       <button className="two-span">AC</button>
       <button>DEL</button>
-      <button>÷</button>
-
+      <OperationButton dispatch={dispatch} operation="÷" />
       <DigitButton dispatch={dispatch} digit="1" />
       <DigitButton dispatch={dispatch} digit="2" />
       <DigitButton dispatch={dispatch} digit="3" />
@@ -69,7 +109,9 @@ const App = () => {
       <OperationButton dispatch={dispatch} operation="-" />
       <DigitButton dispatch={dispatch} digit="." />
       <DigitButton dispatch={dispatch} digit="0" />
-      <button className="two-span">=</button>
+      <button className="two-span"></button>
+
+      {/* addd onclick for = sign */}
     </div>
   );
 };
