@@ -14,9 +14,25 @@ export const ACTIONS = {
 function reducer(state, { type, payload }) {
   switch (type) {
     case ACTIONS.ADD_DIGITS:
+      if (state.currentOperand === "0" && payload.digit === "0") {
+        return state;
+      }
+      if (payload.digit === "." && state.currentOperand.includes(".")) {
+        return state;
+      }
       return {
         ...state,
         currentOperand: `${state.currentOperand || ""}${payload.digit}`,
+      };
+    case ACTIONS.CHOOSE_OPERATION:
+      if (state.currentOperand == null) {
+        return state;
+      }
+      return {
+        ...state,
+        currentOperand: null,
+        previousOperand: state.currentOperand,
+        operand: payload.operation,
       };
   }
 }
